@@ -1,0 +1,75 @@
+{
+  "countries": [
+    "United States",
+    "Canada",
+    "United Kingdom",
+    "Australia",
+    "Germany",
+    "France"
+  ],
+  "statesByCountry": {
+    "United States": [
+      "California",
+      "New York",
+      "Texas",
+      "Florida",
+      "Washington",
+      "Illinois"
+    ],
+    "Canada": [
+      "Ontario",
+      "Quebec",
+      "British Columbia",
+      "Alberta",
+      "Manitoba"
+    ],
+    "United Kingdom": [
+      "England",
+      "Scotland",
+      "Wales",
+      "Northern Ireland"
+    ],
+    "Australia": [
+      "New South Wales",
+      "Victoria",
+      "Queensland",
+      "Western Australia"
+    ],
+    "Germany": [
+      "Bavaria",
+      "Berlin",
+      "Hamburg",
+      "North Rhine-Westphalia"
+    ],
+    "France": [
+      "Île-de-France",
+      "Provence",
+      "Normandy",
+      "Brittany"
+    ]
+  },
+  "roles": [
+    "Developer",
+    "Designer",
+    "Manager",
+    "Tester",
+    "DevOps Engineer",
+    "Product Owner",
+    "Analyst"
+  ],
+  "departments": [
+    "Engineering",
+    "Design",
+    "Product",
+    "Marketing",
+    "Sales",
+    "Support",
+    "HR",
+    "Finance"
+  ],
+  "statuses": [
+    "active",
+    "inactive",
+    "pending"
+  ]
+}
