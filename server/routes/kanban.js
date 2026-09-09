@@ -1,58 +1,54 @@
 import { Router } from 'express';
-import { read, write, insert, update, remove } from '../db.js';
+import { getColumns, insertColumn, deleteColumn, getCards, insertCard, updateCard, deleteCard } from '../db.js';
 
 const router = Router();
-const C = 'kanban';
-const COLS = 'kanban_columns';
 
-// Columns
-router.get('/columns', (_req, res) => {
-  let cols = read(COLS);
-  if (cols.length === 0) cols = [];
-  res.json(cols);
+router.get('/columns', async (_req, res) => {
+  try { res.json(await getColumns()); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.post('/columns', (req, res) => {
+router.post('/columns', async (req, res) => {
   const { name } = req.body;
   if (!name) return res.status(400).json({ error: 'name required' });
-  const rec = insert(COLS, { name });
-  res.status(201).json(rec);
+  try { res.status(201).json(await insertColumn({ name })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.delete('/columns/:id', (req, res) => {
-  const ok = remove(COLS, req.params.id);
-  if (!ok) return res.status(404).json({ error: 'Not found' });
-  // remove cards in that column too
-  const cards = read(C).filter(c => String(c.columnId) !== req.params.id);
-  write(C, cards);
-  res.json({ success: true });
+router.delete('/columns/:id', async (req, res) => {
+  try {
+    const ok = await deleteColumn(req.params.id);
+    if (!ok) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// Cards
-router.get('/cards', (req, res) => {
-  const { columnId } = req.query;
-  let cards = read(C);
-  if (columnId) cards = cards.filter(c => String(c.columnId) === String(columnId));
-  res.json(cards);
+router.get('/cards', async (req, res) => {
+  try { res.json(await getCards(req.query)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.post('/cards', (req, res) => {
+router.post('/cards', async (req, res) => {
   const { title, columnId } = req.body;
   if (!title || !columnId) return res.status(400).json({ error: 'title and columnId required' });
-  const rec = insert(C, { title, columnId: Number(columnId) });
-  res.status(201).json(rec);
+  try { res.status(201).json(await insertCard({ title, columnId: Number(columnId) })); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.patch('/cards/:id', (req, res) => {
-  const updated = update(C, req.params.id, req.body);
-  if (!updated) return res.status(404).json({ error: 'Not found' });
-  res.json(updated);
+router.patch('/cards/:id', async (req, res) => {
+  try {
+    const updated = await updateCard(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.delete('/cards/:id', (req, res) => {
-  const ok = remove(C, req.params.id);
-  if (!ok) return res.status(404).json({ error: 'Not found' });
-  res.json({ success: true });
+router.delete('/cards/:id', async (req, res) => {
+  try {
+    const ok = await deleteCard(req.params.id);
+    if (!ok) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 export default router;

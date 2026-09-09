@@ -234,6 +234,9 @@ export function ValidationLab() {
       await api.post('/api/form-submissions', { ...values, submittedAt: new Date().toISOString(), type: 'validation-lab' });
       await api.post('/api/activities', { action: 'Validation Lab form submitted', status: 'success' });
       setSubmitState('success');
+      setErrors({});
+      setCrossErrors([]);
+      setAttempts(0);
       addToast('success', 'Form submitted successfully');
     } catch {
       setSubmitState('error');
@@ -249,6 +252,7 @@ export function ValidationLab() {
     setTouched({});
     setCrossErrors([]);
     setSubmitState('idle');
+    setAttempts(0);
     addToast('info', 'Form reset');
   };
 

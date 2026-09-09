@@ -1,16 +1,16 @@
 import { Router } from 'express';
-import { read, insert } from '../db.js';
+import { getFormSubmissions, insertFormSubmission } from '../db.js';
 
 const router = Router();
-const C = 'form_submissions';
 
-router.get('/', (_req, res) => {
-  res.json(read(C));
+router.get('/', async (_req, res) => {
+  try { res.json(await getFormSubmissions()); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.post('/', (req, res) => {
-  const rec = insert(C, req.body);
-  res.status(201).json(rec);
+router.post('/', async (req, res) => {
+  try { res.status(201).json(await insertFormSubmission(req.body)); }
+  catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 export default router;

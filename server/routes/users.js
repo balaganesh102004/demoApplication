@@ -1,49 +1,46 @@
 import { Router } from 'express';
-import { read, insert, update, remove } from '../db.js';
+import { getUsers, getUser, insertUser, updateUser, deleteUser } from '../db.js';
 
 const router = Router();
-const C = 'users';
 
-router.get('/', (req, res) => {
-  const { search, status, role, department } = req.query;
-  let rows = read(C);
-  if (search) {
-    const q = String(search).toLowerCase();
-    rows = rows.filter(r =>
-      r.name?.toLowerCase().includes(q) ||
-      r.email?.toLowerCase().includes(q) ||
-      r.department?.toLowerCase().includes(q)
-    );
-  }
-  if (status && status !== 'all') rows = rows.filter(r => r.status === status);
-  if (role && role !== 'all') rows = rows.filter(r => r.role === role);
-  if (department && department !== 'all') rows = rows.filter(r => r.department === department);
-  res.json(rows);
+router.get('/', async (req, res) => {
+  try {
+    const rows = await getUsers(req.query);
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.get('/:id', (req, res) => {
-  const row = read(C).find(r => String(r.id) === req.params.id);
-  if (!row) return res.status(404).json({ error: 'Not found' });
-  res.json(row);
+router.get('/:id', async (req, res) => {
+  try {
+    const row = await getUser(req.params.id);
+    if (!row) return res.status(404).json({ error: 'Not found' });
+    res.json(row);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.post('/', (req, res) => {
-  const { name, email, status, role, department, joinDate, amount } = req.body;
+router.post('/', async (req, res) => {
+  const { name, email } = req.body;
   if (!name || !email) return res.status(400).json({ error: 'name and email are required' });
-  const record = insert(C, { name, email, status: status || 'pending', role: role || 'User', department: department || 'Engineering', joinDate: joinDate || new Date().toISOString().split('T')[0], amount: Number(amount) || 0 });
-  res.status(201).json(record);
+  try {
+    const record = await insertUser(req.body);
+    res.status(201).json(record);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.patch('/:id', (req, res) => {
-  const updated = update(C, req.params.id, req.body);
-  if (!updated) return res.status(404).json({ error: 'Not found' });
-  res.json(updated);
+router.patch('/:id', async (req, res) => {
+  try {
+    const updated = await updateUser(req.params.id, req.body);
+    if (!updated) return res.status(404).json({ error: 'Not found' });
+    res.json(updated);
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-router.delete('/:id', (req, res) => {
-  const ok = remove(C, req.params.id);
-  if (!ok) return res.status(404).json({ error: 'Not found' });
-  res.json({ success: true });
+router.delete('/:id', async (req, res) => {
+  try {
+    const ok = await deleteUser(req.params.id);
+    if (!ok) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 export default router;
